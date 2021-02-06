@@ -23,12 +23,12 @@ class AdminRoleSeeder extends Seeder
         $user->roles()->attach($role->id);
 
         $role = AdminRole::create([
-            'name' => 'test'
+            'name' => 'editor'
         ]);
-        $actions = AdminAction::get();
+        $actions = AdminAction::where('action', 'like', '%index%')->get();
         $role->actions()->sync($actions->modelKeys());
 
-        $user = AdminUser::where('username', 'test')->first();
+        $user = AdminUser::where('username', 'editor')->first();
         $user->roles()->attach($role->id);
     }
 }

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminUser;
+use App\Models\AdminRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AdminUserController extends Controller
 {
@@ -21,7 +23,7 @@ class AdminUserController extends Controller
      */
     public function index()
     {
-        return AdminUser::paginate();
+        return AdminUser::with('roles')->paginate();
     }
 
     /**
@@ -32,9 +34,11 @@ class AdminUserController extends Controller
      */
     public function store(Request $request)
     {
-        $params = $request->only(['username', 'password']);
-        $params['jwt_secret'] = AdminUser::generateJWTSecret();
-        AdminUser::create($params);
+        $adminUser = new AdminUser;
+        $adminUser->username = $request->username;
+        $adminUser->password = $request->password;
+        $adminUser->jwt_secret = AdminUser::generateJWTSecret();
+        $adminUser->save();
     }
 
     /**
@@ -46,19 +50,6 @@ class AdminUserController extends Controller
     public function show($id)
     {
         return AdminUser::find($id);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\AdminUser  $adminUser
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $adminUser = AdminUser::find($id);
-        $adminUser->save();
     }
 
     /**
@@ -75,12 +66,32 @@ class AdminUserController extends Controller
             return response()
                 ->json(['message' => "Cannot delete your self"], 422);
         }
-        $adminUser = AdminUser::find($id);
-        $adminUser->delete();
+        DB::transaction(function() use($id) {
+            $adminUser = AdminUser::find($id);
+            $adminUser->roles()->detach();
+            $adminUser->delete();
+        });
     }
 
     public function assignRoles(Request $request, $id) {
         $adminUser = AdminUser::find($id);
+        if (AdminUser::isAdmin($adminUser))
+        {
+            $adminRole = AdminRole::where('name', 'admin')->first();
+            if (!in_array($adminRole->id, $request->role_ids) && count($adminRole->users) < 2)
+            {
+                return response()
+                    ->json(['message' => "Not allowed to detach the last admin role user"], 422);
+            }
+        }
         $adminUser->roles()->sync($request->role_ids);
+    }
+
+    public function resetPassword(Request $request, $id) {
+        $adminUser = AdminUser::find($id);
+        $password = base64_encode(random_bytes(8));
+        $adminUser->password = $password;
+        $adminUser->save();
+        return ['password' => $password];
     }
 }

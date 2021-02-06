@@ -41,6 +41,11 @@ class AdminUser extends Model implements AuthenticatableContract, AuthorizableCo
         $this->attributes['jwt_secret'] = base64_encode($value);
     }
 
+    public static function isAdmin($adminUser) {
+        $adminRole = AdminRole::where('name', 'admin')->first();
+        return $adminUser->roles->contains($adminRole);
+    }
+
     public static function generateJWTSecret()
     {
         $secretLength = config('jwt.secret_length');

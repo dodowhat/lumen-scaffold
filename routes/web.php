@@ -33,7 +33,16 @@ $router->group($groupAttributes, function () use ($router) {
     $router->get('profile', 'AdminController@profile');
 
     $router->get('admin_users', 'AdminUserController@index');
+    $router->post('admin_users', 'AdminUserController@store');
+    $router->delete('admin_users/{id}', 'AdminUserController@destroy');
+    $router->patch('admin_users/{id}/reset_password', 'AdminUserController@resetPassword');
+    $router->patch('admin_users/{id}/assign_roles', 'AdminUserController@assignRoles');
+
     $router->get('admin_roles', 'AdminRoleController@index');
+    $router->post('admin_roles', 'AdminRoleController@store');
+    $router->delete('admin_roles/{id}', 'AdminRoleController@destroy');
+    $router->patch('admin_roles/{id}/assign_actions', 'AdminRoleController@assignActions');
+
     $router->get('admin_actions', 'AdminActionController@index');
 });
 

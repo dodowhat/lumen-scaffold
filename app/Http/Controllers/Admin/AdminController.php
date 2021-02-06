@@ -12,14 +12,10 @@ use Illuminate\Support\Facades\Crypt;
 
 class AdminController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('admin.authorize', ['only' => ['profile']]);
-    }
 
     public function login(Request $request)
     {
-        $adminUser = AdminUser::where('username', $request->username)->first();
+        $adminUser = AdminUser::where('username', $request->username)->with('roles')->first();
 
         if (!$adminUser || !Hash::check($request->password, $adminUser->password))
         {
@@ -39,6 +35,9 @@ class AdminController extends Controller
 
         return response()
             ->json($adminUser)
+            // ->header('Access-Control-Allow-Origin', '*')
+            // ->header('Access-Control-Allow-Methods', 'Get, POST, PUT, DELETE, OPTIONS, HEAD')
+            // ->header('Access-Control-Allow-Headers', $header)
             ->header($header, $prefix . $token);
     }
 

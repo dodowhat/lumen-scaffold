@@ -9,7 +9,11 @@ class AdminAction extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['action', 'description'];
+    protected $fillable = ['action', 'name'];
+
+    public function group() {
+        return $this->belongsTo(AdminActionGroup::class);
+    }
 
     public function roles()
     {

@@ -23,8 +23,7 @@ class AdminRBACPolicy
 
     public function authorize(AdminUser $adminUser, $action)
     {
-        $adminRole = AdminRole::where('name', 'admin')->first();
-        if ($adminUser->roles->contains($adminRole))
+        if (AdminUser::isAdmin($adminUser))
         {
             return true;
         }

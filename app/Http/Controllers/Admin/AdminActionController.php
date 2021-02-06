@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminAction;
+use App\Models\AdminActionGroup;
 use Illuminate\Http\Request;
 
 class AdminActionController extends Controller
@@ -20,7 +20,7 @@ class AdminActionController extends Controller
      */
     public function index()
     {
-        return AdminAction::get();
+        return AdminActionGroup::with('actions')->get();
     }
 
 }

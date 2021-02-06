@@ -20,8 +20,8 @@ class AdminUserSeeder extends Seeder
             'jwt_secret' => AdminUser::generateJWTSecret()
         ]);
         AdminUser::create([
-            'username' => 'test',
-            'password' => 'test',
+            'username' => 'editor',
+            'password' => 'editor',
             'jwt_secret' => AdminUser::generateJWTSecret()
         ]);
     }

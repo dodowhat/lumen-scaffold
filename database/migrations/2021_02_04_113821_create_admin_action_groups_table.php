@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAdminActionsTable extends Migration
+class CreateAdminActionGroupsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateAdminActionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('admin_actions', function (Blueprint $table) {
+        Schema::create('admin_action_groups', function (Blueprint $table) {
             $table->id();
-            $table->string('action')->unique();
             $table->string('name');
-            $table->foreignId('admin_action_group_id');
+            $table->timestamps();
         });
     }
 
@@ -28,6 +27,6 @@ class CreateAdminActionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admin_actions');
+        Schema::dropIfExists('admin_action_groups');
     }
 }

@@ -66,7 +66,7 @@ class AuthServiceProvider extends ServiceProvider
                 }
 
                 $subject = Crypt::decrypt($jwt->sub);
-                $adminUser = AdminUser::find($subject);
+                $adminUser = AdminUser::with('roles')->find($subject);
 
                 $jwt->verify($adminUser->jwt_secret);
             } catch (InvalidSignatureException | JwtException | InvalidJwtException | DecryptException $e) {
