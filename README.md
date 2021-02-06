@@ -16,7 +16,7 @@ Frontend admin dashboard: [vue-admin](https://github.com/dodowhat/vue-admin)
 
 ### System Requirements
 
-Reference [Lumen Official Document](https://lumen.laravel.com/docs/8.x/installation#installation)
+Reference [Lumen Installation](https://lumen.laravel.com/docs/8.x/installation#installation)
 
 ### Downloading Project
 
