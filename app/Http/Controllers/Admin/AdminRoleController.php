@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminRole;
+use App\Models\AdminAction;
 use Facade\Ignition\Middleware\AddLogs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AdminRoleController extends Controller
 {
@@ -33,6 +35,14 @@ class AdminRoleController extends Controller
      */
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+           'name' => 'bail|required|alpha_num|min:3|unique:admin_roles' 
+        ]);
+        if ($validator->fails()) {
+            $message = join(';', $validator->errors()->all());
+            return response()
+                ->json(['message' => $message], 422);
+        }
         $params = $request->only(['name']);
         AdminRole::create($params);
     }
@@ -45,7 +55,7 @@ class AdminRoleController extends Controller
      */
     public function destroy($id)
     {
-        $role = AdminRole::find($id);
+        $role = AdminRole::findOrFail($id);
 
         if ($role->name == 'admin')
         {
@@ -53,7 +63,7 @@ class AdminRoleController extends Controller
                 ->json(['message' => "Not allowed to delete role 'admin'"], 422);
         }
 
-        if (count($role->users) > 0)
+        if ($role->users()->count() > 0)
         {
             return response()
                 ->json(['message' => "There are users assigned to this role.\nDetach first"], 422);
@@ -68,11 +78,22 @@ class AdminRoleController extends Controller
 
     public function assignActions(Request $request, $id)
     {
-        $role = AdminRole::find($id);
+        $role = AdminRole::findOrFail($id);
         if ($role->name == 'admin') {
             return response()
                 ->json(['message' => "Role 'admin' no need to assign actions"], 422);
         }
-        $role->actions()->sync($request->action_ids);
+
+        $validator = Validator::make($request->all(), [
+           'action_ids' => 'bail|array' 
+        ]);
+        if ($validator->fails()) {
+            $message = join(';', $validator->errors()->all());
+            return response()
+                ->json(['message' => $message], 422);
+        }
+
+        $actions = AdminAction::whereIn('id', $request->action_ids)->get();
+        $role->actions()->sync($actions->modelKeys());
     }
 }

@@ -8,6 +8,7 @@ use App\Models\AdminRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AdminUserController extends Controller
 {
@@ -34,6 +35,16 @@ class AdminUserController extends Controller
      */
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+           'username' => 'bail|required|alpha_num|min:3|unique:admin_users',
+           'password' => 'bail|required|min:8'
+        ]);
+        if ($validator->fails()) {
+            $message = join(';', $validator->errors()->all());
+            return response()
+                ->json(['message' => $message], 422);
+        }
+
         $adminUser = new AdminUser;
         $adminUser->username = $request->username;
         $adminUser->password = $request->password;
@@ -49,7 +60,7 @@ class AdminUserController extends Controller
      */
     public function show($id)
     {
-        return AdminUser::find($id);
+        return AdminUser::findOrFail($id);
     }
 
     /**
@@ -67,28 +78,39 @@ class AdminUserController extends Controller
                 ->json(['message' => "Cannot delete your self"], 422);
         }
         DB::transaction(function() use($id) {
-            $adminUser = AdminUser::find($id);
+            $adminUser = AdminUser::findOrFail($id);
             $adminUser->roles()->detach();
             $adminUser->delete();
         });
     }
 
     public function assignRoles(Request $request, $id) {
-        $adminUser = AdminUser::find($id);
+        $adminUser = AdminUser::findOrFail($id);
         if (AdminUser::isAdmin($adminUser))
         {
             $adminRole = AdminRole::where('name', 'admin')->first();
-            if (!in_array($adminRole->id, $request->role_ids) && count($adminRole->users) < 2)
+            if (!in_array($adminRole->id, $request->role_ids) && $adminRole->users()->count() < 2)
             {
                 return response()
                     ->json(['message' => "Not allowed to detach the last admin role user"], 422);
             }
         }
-        $adminUser->roles()->sync($request->role_ids);
+
+        $validator = Validator::make($request->all(), [
+           'role_ids' => 'bail|array' 
+        ]);
+        if ($validator->fails()) {
+            $message = join(';', $validator->errors()->all());
+            return response()
+                ->json(['message' => $message], 422);
+        }
+
+        $roles = AdminRole::whereIn('id', $request->role_ids)->get();
+        $adminUser->roles()->sync($roles->modelKeys());
     }
 
     public function resetPassword(Request $request, $id) {
-        $adminUser = AdminUser::find($id);
+        $adminUser = AdminUser::findOrFail($id);
         $password = base64_encode(random_bytes(8));
         $adminUser->password = $password;
         $adminUser->save();

@@ -9,6 +9,7 @@ use App\Extensions\JWT;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
@@ -35,9 +36,6 @@ class AdminController extends Controller
 
         return response()
             ->json($adminUser)
-            // ->header('Access-Control-Allow-Origin', '*')
-            // ->header('Access-Control-Allow-Methods', 'Get, POST, PUT, DELETE, OPTIONS, HEAD')
-            // ->header('Access-Control-Allow-Headers', $header)
             ->header($header, $prefix . $token);
     }
 
@@ -45,7 +43,7 @@ class AdminController extends Controller
     {
         $currentUser = Auth::guard('admin_api')->user();
 
-        $adminUser = AdminUser::find($currentUser->id);
+        $adminUser = AdminUser::findOrFail($currentUser->id);
         $secretLength = config('jwt.secret_length');
         $adminUser->jwt_secret = random_bytes($secretLength);
         $adminUser->save();
@@ -55,5 +53,28 @@ class AdminController extends Controller
     {
         $currentUser = Auth::guard('admin_api')->user();
         return $currentUser;
+    }
+
+    public function updatePassword(Request $request) {
+        $currentUser = Auth::guard('admin_api')->user();
+
+        if (!Hash::check($request->password, $currentUser->password))
+        {
+            return response()
+                ->json(['message' => "Authentication failed"], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'new_password' => 'bail|required|min:8'
+        ]);
+        if ($validator->fails()) {
+            $message = join(';', $validator->errors()->all());
+            return response()
+                ->json(['message' => $message], 422);
+        }
+
+        $currentUser->password = $request->new_password;
+        $adminUser = AdminUser::findOrFail($currentUser->id);
+        $adminUser->save();
     }
 }
