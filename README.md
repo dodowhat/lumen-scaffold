@@ -9,8 +9,8 @@ Frontend admin dashboard: [vue-admin](https://github.com/dodowhat/vue-admin)
 ## Features
 
 - Managing Admin User and Normal User in independent tables
-- JWT authentication for Admin User and Normal User separately
-- Admin User RBAC(Role based access control)
+- JWT token authentication for Admin User and Normal User separately
+- Admin User RBAC(Role Based Access Control)
 
 ## Delevelopment
 
