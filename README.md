@@ -29,11 +29,9 @@ Reference [Lumen Official Document](https://lumen.laravel.com/docs/8.x/installat
 
 ### Configure Database
 
-1. Generate .env config file
+1. Copy `.env.example` to `.env`
 
-    cp .env.example .env
-
-2. Edit database configuration in .env
+2. Edit database configuration in `.env`
 
 3. Create database manually
 
