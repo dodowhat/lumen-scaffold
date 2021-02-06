@@ -31,6 +31,7 @@ $groupAttributes['middleware'] = 'auth:admin_api';
 $router->group($groupAttributes, function () use ($router) {
     $router->delete('logout', 'AdminController@logout');
     $router->get('profile', 'AdminController@profile');
+    $router->patch('update_password', 'AdminController@updatePassword');
 
     $router->get('admin_users', 'AdminUserController@index');
     $router->post('admin_users', 'AdminUserController@store');

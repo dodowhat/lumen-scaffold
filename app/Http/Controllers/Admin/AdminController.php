@@ -61,7 +61,7 @@ class AdminController extends Controller
         if (!Hash::check($request->password, $currentUser->password))
         {
             return response()
-                ->json(['message' => "Authentication failed"], 401);
+                ->json(['message' => "Authentication failed"], 422);
         }
 
         $validator = Validator::make($request->all(), [
@@ -73,8 +73,8 @@ class AdminController extends Controller
                 ->json(['message' => $message], 422);
         }
 
-        $currentUser->password = $request->new_password;
         $adminUser = AdminUser::findOrFail($currentUser->id);
+        $adminUser->password = $request->new_password;
         $adminUser->save();
     }
 }
