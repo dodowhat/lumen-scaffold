@@ -23,15 +23,15 @@ $groupAttributes = [
 ];
 
 $router->group($groupAttributes, function () use ($router) {
-    $router->post('login', 'AdminController@login');
+    $router->post('auth', 'AdminController@login');
 });
 
 $groupAttributes['middleware'] = 'auth:admin_api';
 
 $router->group($groupAttributes, function () use ($router) {
-    $router->delete('logout', 'AdminController@logout');
-    $router->get('profile', 'AdminController@profile');
-    $router->patch('update_password', 'AdminController@updatePassword');
+    $router->delete('auth', 'AdminController@logout');
+    $router->get('auth', 'AdminController@profile');
+    $router->patch('auth/update_password', 'AdminController@updatePassword');
 
     $router->get('admin_users', 'AdminUserController@index');
     $router->post('admin_users', 'AdminUserController@store');
@@ -50,7 +50,7 @@ $router->group($groupAttributes, function () use ($router) {
 $groupAttributes = ['middleware' => 'auth:app_api'];
 
 $router->group($groupAttributes, function () use ($router) {
-    $router->post('/login', 'AppController@login');
-    $router->delete('/logout', 'AppController@logout');
-    $router->get('/profile', 'AppController@profile');
+    $router->post('/auth', 'AppController@login');
+    $router->delete('/auth', 'AppController@logout');
+    $router->get('/auth', 'AppController@profile');
 });

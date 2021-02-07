@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
 
-class AppController extends Controller
+class AppAuthController extends Controller
 {
     public function login(Request $request)
     {

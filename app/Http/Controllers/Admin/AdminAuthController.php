@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 
-class AdminController extends Controller
+class AdminAuthController extends Controller
 {
 
     public function login(Request $request)
