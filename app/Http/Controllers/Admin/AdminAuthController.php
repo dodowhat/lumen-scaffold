@@ -8,7 +8,6 @@ use App\Models\AdminUser;
 use App\Extensions\JWT;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 
 class AdminAuthController extends Controller
@@ -30,8 +29,8 @@ class AdminAuthController extends Controller
         $audience = config('jwt.audience.admin');
 
         $jwt = JWT::create($algorithm);
-        $jwt->sub = Crypt::encrypt($adminUser->id);
-        $jwt->aud = Crypt::encrypt($audience);
+        $jwt->sub = $adminUser->id;
+        $jwt->aud = $audience;
         $token = $jwt->encode($adminUser->jwt_secret);
 
         return response()

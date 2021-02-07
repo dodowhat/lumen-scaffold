@@ -8,7 +8,6 @@ use App\Models\AppUser;
 use App\Extensions\JWT;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Crypt;
 
 class AppAuthController extends Controller
 {
@@ -28,8 +27,8 @@ class AppAuthController extends Controller
         $audience = config('jwt.audience.app');
 
         $jwt = JWT::create($algorithm);
-        $jwt->sub = Crypt::encrypt($appUser->id);
-        $jwt->aud = Crypt::encrypt($audience);
+        $jwt->sub = $appUser->id;
+        $jwt->aud = $audience;
         $token = $jwt->encode($appUser->jwt_secret);
 
         return response()

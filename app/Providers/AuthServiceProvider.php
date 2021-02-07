@@ -14,7 +14,6 @@ use Lindelius\JWT\Exception\InvalidSignatureException;
 use Lindelius\JWT\Exception\JwtException;
 use Lindelius\JWT\Exception\InvalidJwtException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
 
 class AuthServiceProvider extends ServiceProvider
@@ -59,13 +58,13 @@ class AuthServiceProvider extends ServiceProvider
                 $jwt = JWT::decode($token);
 
                 $audience = config('jwt.audience.admin');
-                $aud = Crypt::decrypt($jwt->aud);
+                $aud = $jwt->aud;
                 if ($aud != $audience) {
                     Log::error('Invalid Token: wrong audience');
                     return null;
                 }
 
-                $subject = Crypt::decrypt($jwt->sub);
+                $subject = $jwt->sub;
                 $adminUser = AdminUser::with('roles')->find($subject);
 
                 $jwt->verify($adminUser->jwt_secret);
@@ -89,13 +88,13 @@ class AuthServiceProvider extends ServiceProvider
                 $jwt = JWT::decode($token);
 
                 $audience = config('jwt.audience.app');
-                $aud = Crypt::decrypt($jwt->aud);
+                $aud = $jwt->aud;
                 if ($aud != $audience) {
                     Log::error('Invalid Token: wrong audience');
                     return null;
                 }
 
-                $subject = Crypt::decrypt($jwt->sub);
+                $subject = $jwt->sub;
                 $appUser = AppUser::find($subject);
 
                 $jwt->verify($appUser->jwt_secret);
