@@ -57,7 +57,7 @@ class AdminRoleController extends Controller
     {
         $role = AdminRole::findOrFail($id);
 
-        if ($role->name == 'admin')
+        if (AdminRole::isAdmin($role))
         {
             return response()
                 ->json(['message' => "Not allowed to delete role 'admin'"], 405);
@@ -88,7 +88,7 @@ class AdminRoleController extends Controller
         }
 
         $role = AdminRole::findOrFail($id);
-        if ($role->name == 'admin') {
+        if (AdminRole::isAdmin($role)) {
             return response()
                 ->json(['message' => "Role 'admin' no need to assign actions"], 405);
         }

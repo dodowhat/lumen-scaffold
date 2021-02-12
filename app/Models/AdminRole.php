@@ -20,4 +20,8 @@ class AdminRole extends Model
     {
         return $this->belongsToMany(AdminAction::class);
     }
+
+    public static function isAdmin($adminRole) {
+        $adminRole->name == "admin";
+    }
 }
