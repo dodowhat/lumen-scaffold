@@ -75,7 +75,7 @@ class AdminUserController extends Controller
         if ($currentUser->id == $id)
         {
             return response()
-                ->json(['message' => "Cannot delete your self"], 422);
+                ->json(['message' => "Not allowed to delete yourself"], 405);
         }
         DB::transaction(function() use($id) {
             $adminUser = AdminUser::findOrFail($id);
@@ -85,16 +85,6 @@ class AdminUserController extends Controller
     }
 
     public function assignRoles(Request $request, $id) {
-        $adminUser = AdminUser::findOrFail($id);
-        if (AdminUser::isAdmin($adminUser))
-        {
-            $adminRole = AdminRole::where('name', 'admin')->first();
-            if (!in_array($adminRole->id, $request->role_ids) && $adminRole->users()->count() < 2)
-            {
-                return response()
-                    ->json(['message' => "Not allowed to detach the last admin role user"], 422);
-            }
-        }
 
         $validator = Validator::make($request->all(), [
            'role_ids' => 'bail|array' 
@@ -105,14 +95,32 @@ class AdminUserController extends Controller
                 ->json(['message' => $message], 422);
         }
 
+        $adminUser = AdminUser::findOrFail($id);
+        if (AdminUser::isAdmin($adminUser))
+        {
+            $adminRole = AdminRole::where('name', 'admin')->first();
+            if (!in_array($adminRole->id, $request->role_ids) && $adminRole->users()->count() < 2)
+            {
+                return response()
+                    ->json(['message' => "Not allowed to detach the last admin role user"], 405);
+            }
+        }
+
         $roles = AdminRole::whereIn('id', $request->role_ids)->get();
         $adminUser->roles()->sync($roles->modelKeys());
     }
 
     public function resetPassword(Request $request, $id) {
+        $currentUser = Auth::guard('admin_api')->user();
+        if ($currentUser->id == $id)
+        {
+            return response()
+                ->json(['message' => "Not allowed to reset password for yourself"], 405);
+        }
         $adminUser = AdminUser::findOrFail($id);
         $password = base64_encode(random_bytes(8));
         $adminUser->password = $password;
+        $adminUser->jwt_secret = AdminUser::generateJWTSecret();
         $adminUser->save();
         return ['password' => $password];
     }

@@ -16,7 +16,6 @@ class CreateAdminActionGroupsTable extends Migration
         Schema::create('admin_action_groups', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->timestamps();
         });
     }
 

@@ -60,13 +60,13 @@ class AdminRoleController extends Controller
         if ($role->name == 'admin')
         {
             return response()
-                ->json(['message' => "Not allowed to delete role 'admin'"], 422);
+                ->json(['message' => "Not allowed to delete role 'admin'"], 405);
         }
 
         if ($role->users()->count() > 0)
         {
             return response()
-                ->json(['message' => "There are users assigned to this role.\nDetach first"], 422);
+                ->json(['message' => "There are users assigned to this role. Detach first"], 422);
         }
 
         DB::transaction(function() use($role) {
@@ -78,12 +78,6 @@ class AdminRoleController extends Controller
 
     public function assignActions(Request $request, $id)
     {
-        $role = AdminRole::findOrFail($id);
-        if ($role->name == 'admin') {
-            return response()
-                ->json(['message' => "Role 'admin' no need to assign actions"], 422);
-        }
-
         $validator = Validator::make($request->all(), [
            'action_ids' => 'bail|array' 
         ]);
@@ -91,6 +85,12 @@ class AdminRoleController extends Controller
             $message = join(';', $validator->errors()->all());
             return response()
                 ->json(['message' => $message], 422);
+        }
+
+        $role = AdminRole::findOrFail($id);
+        if ($role->name == 'admin') {
+            return response()
+                ->json(['message' => "Role 'admin' no need to assign actions"], 405);
         }
 
         $actions = AdminAction::whereIn('id', $request->action_ids)->get();
