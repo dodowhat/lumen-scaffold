@@ -41,7 +41,7 @@ class AdminRoleController extends Controller
         if ($validator->fails()) {
             $message = join(';', $validator->errors()->all());
             return response()
-                ->json(['message' => $message], 422);
+                ->json(['message' => $message], 400);
         }
         $params = $request->only(['name']);
         AdminRole::create($params);
@@ -66,7 +66,7 @@ class AdminRoleController extends Controller
         if ($role->users()->count() > 0)
         {
             return response()
-                ->json(['message' => "There are users assigned to this role. Detach first"], 422);
+                ->json(['message' => "There are users assigned to this role. Detach first"], 405);
         }
 
         DB::transaction(function() use($role) {
@@ -84,7 +84,7 @@ class AdminRoleController extends Controller
         if ($validator->fails()) {
             $message = join(';', $validator->errors()->all());
             return response()
-                ->json(['message' => $message], 422);
+                ->json(['message' => $message], 400);
         }
 
         $role = AdminRole::findOrFail($id);

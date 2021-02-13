@@ -60,7 +60,7 @@ class AdminAuthController extends Controller
         if (!Hash::check($request->password, $currentUser->password))
         {
             return response()
-                ->json(['message' => "Authentication failed"], 422);
+                ->json(['message' => "Authentication failed"], 400);
         }
 
         $validator = Validator::make($request->all(), [
@@ -69,7 +69,7 @@ class AdminAuthController extends Controller
         if ($validator->fails()) {
             $message = join(';', $validator->errors()->all());
             return response()
-                ->json(['message' => $message], 422);
+                ->json(['message' => $message], 400);
         }
 
         $adminUser = AdminUser::findOrFail($currentUser->id);

@@ -42,7 +42,7 @@ class AdminUserController extends Controller
         if ($validator->fails()) {
             $message = join(';', $validator->errors()->all());
             return response()
-                ->json(['message' => $message], 422);
+                ->json(['message' => $message], 400);
         }
 
         $adminUser = new AdminUser;
@@ -92,7 +92,7 @@ class AdminUserController extends Controller
         if ($validator->fails()) {
             $message = join(';', $validator->errors()->all());
             return response()
-                ->json(['message' => $message], 422);
+                ->json(['message' => $message], 400);
         }
 
         $adminUser = AdminUser::findOrFail($id);
