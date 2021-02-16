@@ -4,7 +4,7 @@ RESTful API backend service scaffold with basic features
 
 Based on [Lumen 8.x](https://lumen.laravel.com/)
 
-Frontend admin dashboard: [vue-admin](https://github.com/dodowhat/vue-admin)
+Frontend admin dashboard: [vue-admin-scaffold](https://github.com/dodowhat/vue-admin-scaffold)
 
 ## Features
 
